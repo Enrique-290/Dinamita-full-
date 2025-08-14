@@ -1,10 +1,546 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DINÁMITA POS — v3.1</title></head>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DINÁMITA POS — v3.2 (Single File)</title>
+<style>
+:root{
+  --bg:#f7f7f8;
+  --card:#ffffff;
+  --text:#0f0f10;
+  --muted:#5f6063;
+  --brand:#e50914; /* rojo dinamita */
+  --accent:#111;
+  --pill:#efefef;
+  --ok:#0c9e4c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+header{display:flex;gap:16px;align-items:center;padding:12px 16px;border-bottom:1px solid #e6e6e8;background:#fff;position:sticky;top:0;z-index:5}
+.logo{width:40px;height:40px;border-radius:10px;background:#111;display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.logo::after{content:"💥"}
+.brand{line-height:1}
+.brand b{display:block;font-size:16px;letter-spacing:.6px}
+.badge{margin-left:auto;font-size:12px;color:var(--brand);font-weight:700}
+#email{padding:8px 12px;border:1px solid #ddd;border-radius:10px;min-width:220px}
+button, .btn{appearance:none;border:0;border-radius:12px;background:var(--brand);color:#fff;padding:12px 16px;font-weight:700}
+button.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+button.pill{background:var(--pill);color:#111}
+.container{max-width:920px;margin:0 auto;padding:16px}
+h1{font-size:40px;margin:16px 0 8px}
+h2{font-size:28px;margin:8px 0 16px}
+.card{background:var(--card);border:1px solid #eee;border-radius:18px;padding:14px 16px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.grid{display:grid;gap:12px}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+@media (max-width:720px){.grid.cols-2{grid-template-columns:1fr}}
+.input{display:grid;gap:6px}
+.input input,.input select{padding:10px 12px;border:1px solid #ddd;border-radius:10px;width:100%}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+.kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;background:#000;color:#fff;padding:2px 6px;border-radius:6px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabs button{background:#111;color:#fff}
+.tabs .off{background:#eee;color:#111}
+.hidden{display:none!important}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.right{margin-left:auto}
+.meta{color:var(--muted);font-size:12px}
+.sep{height:1px;background:#eee;margin:10px 0}
+.center{display:grid;place-items:center}
+/* Modal Ticket */
+.modal_bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal{background:#fff;border-radius:16px;max-width:520px;width:100%;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+.modal .head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}
+.modal .body{padding:14px 16px}
+.tag{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;background:#fef2f2;color:#a80712;border:1px dashed #f4b4b9;border-radius:999px;font-size:12px}
+.notice{font-size:12px;color:var(--muted)}
+.hr{height:1px;background:#eee;margin:10px 0}
+/* Chips */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips .chip{background:#f3f4f6;border:1px solid #e5e7eb;color:#111;padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer}
+.chips .chip.active{background:#111;color:#fff}
+.small{font-size:12px}
+.success{color:var(--ok)}
+.warn{color:#b45309}
+</style>
+</head>
 <body>
-  <h1>DINÁMITA POS v3.1</h1>
-  <p>Si ves esta pantalla, la versión extendida no se pudo reconstruir. Avísame y te la vuelvo a generar.</p>
+<header>
+  <div class="logo"></div>
+  <div class="brand">
+    <b>DINÁMITA <span style="color:var(--brand)">POS</span></b>
+    <span class="meta">Single File — Local</span>
+  </div>
+  <span class="badge" id="safeTag">Modo Seguro (sin impresora)</span>
+  <input id="email" placeholder="tu correo"/>
+  <button class="pill" id="loginBtn">Entrar</button>
+</header>
+
+<div class="container">
+  <!-- MENÚ -->
+  <section id="menu" class="card">
+    <h1>Menú Principal</h1>
+    <div class="grid cols-2">
+      <button class="btn" onclick="nav('ventas')">🛒 Ventas</button>
+      <button class="btn ghost" onclick="nav('clientes')">👤 Clientes</button>
+      <button class="btn ghost" onclick="nav('inventarioProductos')">📦 Inventario (Productos)</button>
+      <button class="btn ghost" onclick="nav('inventarioServicios')">🧾 Inventario (Servicios)</button>
+      <button class="btn ghost" onclick="nav('membresias')">💳 Control de Mensualidades</button>
+      <button class="btn ghost" onclick="nav('reportes')">📈 Reportes</button>
+      <button class="btn pill" onclick="resetDemo()">🔄 Reset demo</button>
+    </div>
+  </section>
+
+  <!-- VENTAS -->
+  <section id="ventas" class="card hidden">
+    <div class="row"><h2>Ventas</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="chips" id="ventaTabs">
+      <div class="chip active" data-tab="prod">Productos</div>
+      <div class="chip" data-tab="serv">Servicios</div>
+    </div>
+    <div id="ventaProd">
+      <div class="input"><label>Buscar</label><input id="buscarProd" placeholder="nombre o SKU" oninput="renderVentaProductos()"/></div>
+      <div class="sep"></div>
+      <table class="table" id="tblVentaProd"></table>
+    </div>
+    <div id="ventaServ" class="hidden">
+      <div class="input"><label>Servicios disponibles</label></div>
+      <table class="table" id="tblVentaServ"></table>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <select id="pago">
+        <option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option>
+      </select>
+      <button class="right" onclick="finalizarVenta()">Finalizar venta</button>
+    </div>
+    <div class="meta">Carrito: <span id="carritoCount">0</span> items — <b id="carritoTotal">$0</b></div>
+  </section>
+
+  <!-- INVENTARIO PRODUCTOS -->
+  <section id="inventarioProductos" class="card hidden">
+    <div class="row"><h2>Inventario (Productos)</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="grid cols-2">
+      <div class="input"><label>SKU</label><input id="p_sku"/></div>
+      <div class="input"><label>Precio venta ($)</label><input id="p_precio" type="number"/></div>
+      <div class="input"><label>Nombre</label><input id="p_nombre"/></div>
+      <div class="input"><label>Stock (pz)</label><input id="p_stock" type="number"/></div>
+      <div class="input"><label>Categoría</label>
+        <select id="p_cat"></select>
+        <div class="small">¿No está? <a href="#" onclick="agregarCategoriaPrompt();return false;">Agregar nueva categoría</a></div>
+      </div>
+      <div class="input"><label>Imagen (URL)</label><input id="p_img" placeholder="https://"/></div>
+      <div class="input"><label>Precio compra ($)</label><input id="p_costo" type="number" step="0.01"/></div>
+      <div class="input"><label>Sumar al stock (+pz)</label><input id="p_sumar" type="number" placeholder="ej. 10"/></div>
+    </div>
+    <div class="row">
+      <button onclick="guardarProducto()">Guardar</button>
+      <button class="pill" onclick="limpiarProd()">Limpiar</button>
+    </div>
+    <div class="sep"></div>
+    <table class="table" id="tblProd"></table>
+  </section>
+
+  <!-- INVENTARIO SERVICIOS -->
+  <section id="inventarioServicios" class="card hidden">
+    <div class="row"><h2>Inventario (Servicios)</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="grid cols-2">
+      <div class="input"><label>Nombre del servicio</label><input id="s_nombre"/></div>
+      <div class="input"><label>Precio ($)</label><input id="s_precio" type="number"/></div>
+      <div class="input"><label>Duración (días)</label><input id="s_dias" type="number" placeholder="Ej. 30, 7, 1, 180, 365"/></div>
+      <div class="input"><label>Tipo</label>
+        <select id="s_tipo">
+          <option value="mensualidad">Mensualidad</option>
+          <option value="semana">Semana</option>
+          <option value="visita">Visita</option>
+          <option value="seis">6 meses</option>
+          <option value="anual">12 meses</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <button onclick="guardarServicio()">Guardar</button>
+      <button class="pill" onclick="limpiarServ()">Limpiar</button>
+    </div>
+    <div class="sep"></div>
+    <table class="table" id="tblServ"></table>
+  </section>
+
+  <!-- MEMBRESÍAS -->
+  <section id="membresias" class="card hidden">
+    <div class="row"><h2>Control de Mensualidades</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="grid cols-2">
+      <div class="input"><label>Cliente</label><input id="m_cliente" placeholder="Nombre"/></div>
+      <div class="input"><label>Servicio</label>
+        <select id="m_serv"></select>
+      </div>
+      <div class="input"><label>Fecha inicio</label><input id="m_inicio" type="date"/></div>
+      <div class="input"><label>Fecha fin (auto)</label><input id="m_fin" type="date" disabled/></div>
+    </div>
+    <div class="row">
+      <span class="notice">Gracia automática: <b>1 día</b> solo para mensualidades.</span>
+      <button class="right" onclick="registrarMembresia()">Registrar</button>
+    </div>
+    <div class="sep"></div>
+    <table class="table" id="tblMemb"></table>
+  </section>
+
+  <!-- CLIENTES -->
+  <section id="clientes" class="card hidden">
+    <div class="row"><h2>Clientes</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="grid cols-2">
+      <div class="input"><label>Nombre</label><input id="c_nombre"/></div>
+      <div class="input"><label>Correo</label><input id="c_correo"/></div>
+      <div class="input"><label>Peso (kg)</label><input id="c_peso" type="number" step="0.1"/></div>
+      <div class="input"><label>Edad (años)</label><input id="c_edad" type="number"/></div>
+      <div class="input"><label>¿Certificado médico?</label>
+        <select id="c_cert"><option>No</option><option>Sí</option></select>
+      </div>
+      <div class="input"><label>Padecimientos</label><input id="c_pade"/></div>
+      <div class="input"><label>Observaciones del gym</label><input id="c_obs"/></div>
+    </div>
+    <div class="row">
+      <button onclick="guardarCliente()">Guardar</button>
+      <button class="pill" onclick="limpiarCliente()">Limpiar</button>
+    </div>
+    <div class="sep"></div>
+    <table class="table" id="tblClientes"></table>
+  </section>
+
+  <!-- REPORTES -->
+  <section id="reportes" class="card hidden">
+    <div class="row"><h2>Reportes</h2><button class="pill right" onclick="nav('menu')">← Menú</button></div>
+    <div class="grid cols-2">
+      <div class="card"><div class="meta">Ventas (hoy)</div><h2 id="r_hoy">$0.00</h2></div>
+      <div class="card"><div class="meta">Ventas (total)</div><h2 id="r_total">$0.00</h2></div>
+    </div>
+    <div class="card">
+      <h3>Totales por forma de pago</h3>
+      <table class="table" id="r_pago"></table>
+    </div>
+    <div class="card">
+      <h3>Top Productos / Servicios</h3>
+      <table class="table" id="r_top"></table>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL -->
+<div id="modalBg" class="modal_bg">
+  <div class="modal">
+    <div class="head">
+      <b>DINÁMITA GYM — Ticket</b>
+      <button class="pill" onclick="cerrarModal()">Cerrar</button>
+    </div>
+    <div class="body">
+      <div class="notice">Modo seguro: impresión desactivada. Puedes compartir el total o cerrar.</div>
+      <div class="hr"></div>
+      <div id="ticketBody"></div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="ghost" onclick="tryShare()">Compartir</button>
+        <div class="right meta">Gracias por tu compra 💥</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* --------- STORAGE & STATE --------- */
+const LS = {
+  get(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch(e){ return def }},
+  set(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+};
+const state = {
+  carrito:[],
+  user:"",
+  safe:true
+};
+/* Seed demo data if empty */
+(function seed(){
+  if(!LS.get("categories")) LS.set("categories", ["Agua","Hidratante","Energética","Suplemento"]);
+  if(!LS.get("products")){
+    LS.set("products",[
+      {sku:"758104001972",nombre:"Agua Bonafont 1L",cat:"Agua",precio:14,costo:10,stock:20,img:""},
+      {sku:"758104000159",nombre:"Agua Bonafont 2L",cat:"Agua",precio:20,costo:15.5,stock:20,img:""},
+      {sku:"758104005796",nombre:"Agua Bonafont 1.5L",cat:"Agua",precio:16,costo:12,stock:20,img:""},
+      {sku:"0237433",nombre:"Gatorade 1L",cat:"Hidratante",precio:26,costo:20,stock:20,img:""},
+      {sku:"037617310649",nombre:"Gatorade 600ml",cat:"Hidratante",precio:20,costo:15,stock:20,img:""},
+      {sku:"7503027753",nombre:"Volt Blue",cat:"Energética",precio:22,costo:17,stock:20,img:""},
+      {sku:"7503027753Y",nombre:"Volt Yellow",cat:"Energética",precio:22,costo:17,stock:20,img:""},
+      {sku:"7503027753P",nombre:"Volt Pink",cat:"Energética",precio:22,costo:17,stock:20,img:""},
+      {sku:"ELECTROLIT",nombre:"Electrolit",cat:"Hidratante",precio:25,costo:17,stock:20,img:""},
+      {sku:"TPW",nombre:"T Proteína Whey",cat:"Suplemento",precio:25,costo:20,stock:20,img:""},
+      {sku:"TPM",nombre:"T Proteína Mass",cat:"Suplemento",precio:35,costo:25,stock:20,img:""},
+      {sku:"OX",nombre:"Óxido",cat:"Suplemento",precio:25,costo:20,stock:20,img:""}
+    ]);
+  }
+  if(!LS.get("services")){
+    LS.set("services",[
+      {nombre:"Mensualidad normal",precio:350,dias:30,tipo:"mensualidad"},
+      {nombre:"Mensualidad socios",precio:300,dias:30,tipo:"mensualidad"},
+      {nombre:"Mensualidad VIP",precio:250,dias:30,tipo:"mensualidad"},
+      {nombre:"Semana normal",precio:150,dias:7,tipo:"semana"},
+      {nombre:"Semana socios",precio:130,dias:7,tipo:"semana"},
+      {nombre:"Semana VIP",precio:100,dias:7,tipo:"semana"},
+      {nombre:"Visita normal",precio:50,dias:1,tipo:"visita"},
+      {nombre:"Visita socio",precio:30,dias:1,tipo:"visita"},
+      {nombre:"Visita VIP",precio:25,dias:1,tipo:"visita"},
+      {nombre:"Paquete 6 meses",precio:1500,dias:180,tipo:"seis"},
+      {nombre:"Anualidad 12 meses",precio:2760,dias:365,tipo:"anual"}
+    ]);
+  }
+  if(!LS.get("clients")) LS.set("clients", []);
+  if(!LS.get("sales")) LS.set("sales", []);
+  if(!LS.get("memberships")) LS.set("memberships", []);
+})();
+
+/* --------- NAV --------- */
+function nav(id){
+  [...document.querySelectorAll("section")].forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  if(id==="ventas"){ renderVentaTabs(); renderVentaProductos(); renderVentaServicios(); }
+  if(id==="inventarioProductos"){ renderCategorias(); renderProductos(); }
+  if(id==="inventarioServicios"){ renderServicios(); }
+  if(id==="membresias"){ renderServiciosSelect(); renderMembresias(); }
+  if(id==="clientes"){ renderClientes(); }
+  if(id==="reportes"){ renderReportes(); }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("loginBtn").onclick = ()=>{
+  state.user = document.getElementById("email").value.trim();
+  alert(state.user ? "Acceso para "+state.user : "Modo visita");
+};
+function resetDemo(){
+  if(confirm("¿Reiniciar datos de demo?")){ localStorage.clear(); location.reload(); }
+}
+
+/* --------- VENTAS --------- */
+function renderVentaTabs(){
+  document.getElementById("ventaTabs").onclick = (e)=>{
+    if(!e.target.classList.contains("chip")) return;
+    document.querySelectorAll("#ventaTabs .chip").forEach(c=>c.classList.remove("active"));
+    e.target.classList.add("active");
+    const tab=e.target.dataset.tab;
+    document.getElementById("ventaProd").classList.toggle("hidden",tab!=="prod");
+    document.getElementById("ventaServ").classList.toggle("hidden",tab!=="serv");
+  }
+}
+function renderVentaProductos(){
+  const q = (document.getElementById("buscarProd").value||"").toLowerCase();
+  const prods = LS.get("products",[]).filter(p => (p.nombre.toLowerCase().includes(q) || p.sku.includes(q)));
+  const rows = [`<tr><th>SKU</th><th>Producto</th><th>$</th><th>Stock</th><th></th></tr>`,
+    ...prods.map(p=>`<tr>
+      <td>${p.sku}</td><td>${p.nombre}</td><td>$${p.precio}</td><td>${p.stock}</td>
+      <td><button class="pill" onclick="addCarrito({tipo:'producto',sku:'${p.sku}',nombre:'${p.nombre}',precio:${p.precio}})">Agregar</button></td></tr>`)
+  ];
+  document.getElementById("tblVentaProd").innerHTML = rows.join("");
+}
+function renderVentaServicios(){
+  const servs = LS.get("services",[]);
+  const rows = [`<tr><th>Servicio</th><th>$</th><th>Días</th><th></th></tr>`,
+    ...servs.map(s=>`<tr><td>${s.nombre}</td><td>$${s.precio}</td><td>${s.dias}</td>
+    <td><button class="pill" onclick="addCarrito({tipo:'servicio',nombre:'${s.nombre}',precio:${s.precio}})">Agregar</button></td></tr>`)
+  ];
+  document.getElementById("tblVentaServ").innerHTML = rows.join("");
+}
+function addCarrito(item){
+  state.carrito.push({...item,cant:1,sub:item.precio});
+  renderCarritoMeta();
+}
+function renderCarritoMeta(){
+  const total = state.carrito.reduce((a,b)=>a+b.sub,0);
+  document.getElementById("carritoCount").textContent = state.carrito.length;
+  document.getElementById("carritoTotal").textContent = "$"+total.toFixed(2);
+}
+function finalizarVenta(){
+  if(state.carrito.length===0){ alert("Carrito vacío"); return; }
+  const pago = document.getElementById("pago").value;
+  const products = LS.get("products",[]);
+  // bajar stock
+  state.carrito.forEach(i=>{
+    if(i.tipo==='producto'){
+      const idx = products.findIndex(p=>p.sku===i.sku);
+      if(idx>-1 && products[idx].stock>0) products[idx].stock -= 1;
+    }
+  });
+  LS.set("products",products);
+  const total = state.carrito.reduce((a,b)=>a+b.sub,0);
+  const sale = { ts:Date.now(), user:state.user||"anon", pago, items:state.carrito, total };
+  const sales = LS.get("sales",[]); sales.push(sale); LS.set("sales",sales);
+  state.carrito=[]; renderCarritoMeta(); renderProductos();
+  // Ticket
+  mostrarTicket(sale);
+}
+
+/* --------- TICKET --------- */
+function mostrarTicket(sale){
+  const el = document.getElementById("ticketBody");
+  let rows = sale.items.map(i=>`<tr><td>${i.tipo}</td><td>${i.nombre || i.sku}</td><td class="right">$${i.precio}</td></tr>`).join("");
+  el.innerHTML = `<div class="meta">Fecha: ${new Date(sale.ts).toLocaleString()}</div>
+    <table class="table"><tr><th>Tipo</th><th>Concepto</th><th class="right">$</th></tr>${rows}</table>
+    <div class="row"><b>Total</b><b class="right">$${sale.total.toFixed(2)}</b></div>`;
+  document.getElementById("modalBg").style.display="flex";
+}
+function cerrarModal(){ document.getElementById("modalBg").style.display="none"; }
+async function tryShare(){
+  const text = document.getElementById("ticketBody").innerText;
+  if(navigator.share){ try{ await navigator.share({text}); }catch(e){} }
+  else{ navigator.clipboard.writeText(text); alert("Ticket copiado al portapapeles"); }
+}
+
+/* --------- INVENTARIO PRODUCTOS --------- */
+function renderCategorias(){
+  const cats = LS.get("categories",[]);
+  document.getElementById("p_cat").innerHTML = cats.map(c=>`<option>${c}</option>`).join("");
+}
+function agregarCategoriaPrompt(){
+  const name = prompt("Nueva categoría:");
+  if(!name) return;
+  const cats = LS.get("categories",[]);
+  if(!cats.includes(name)){ cats.push(name); LS.set("categories",cats); renderCategorias(); alert("Categoría agregada"); }
+}
+function guardarProducto(){
+  const sku = val("p_sku"), nombre=val("p_nombre"), cat=val("p_cat"),
+        precio=number("p_precio"), stock=number("p_stock"),
+        costo=number("p_costo"), sumar=number("p_sumar"),
+        img=val("p_img");
+  if(!sku || !nombre){ alert("SKU y Nombre son obligatorios"); return; }
+  const list = LS.get("products",[]);
+  const i = list.findIndex(p=>p.sku===sku);
+  if(i>-1){
+    list[i] = { ...list[i], nombre, cat, precio, stock:(stock||list[i].stock)+(sumar||0), costo, img };
+  }else{
+    list.push({sku,nombre,cat,precio,stock:(stock||0)+(sumar||0),costo,img});
+  }
+  LS.set("products",list); limpiarProd(); renderProductos(); alert("Producto guardado");
+}
+function limpiarProd(){ ["p_sku","p_nombre","p_precio","p_stock","p_img","p_costo","p_sumar"].forEach(id=>document.getElementById(id).value=""); }
+function renderProductos(){
+  const list = LS.get("products",[]);
+  const rows = [`<tr><th>SKU</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th></tr>`,
+    ...list.map(p=>`<tr><td>${p.sku}</td><td>${p.nombre}</td><td>${p.cat}</td><td>$${p.precio}</td><td>${p.stock}</td></tr>`)];
+  document.getElementById("tblProd").innerHTML = rows.join("");
+}
+
+/* --------- INVENTARIO SERVICIOS --------- */
+function guardarServicio(){
+  const nombre=val("s_nombre"), precio=number("s_precio"), dias=number("s_dias")||0, tipo=val("s_tipo");
+  if(!nombre || !precio){ alert("Nombre y precio son obligatorios"); return; }
+  const list = LS.get("services",[]);
+  const i = list.findIndex(s=>s.nombre.toLowerCase()===nombre.toLowerCase());
+  const obj = {nombre,precio,dias,tipo};
+  if(i>-1){ list[i]=obj } else { list.push(obj) }
+  LS.set("services",list); limpiarServ(); renderServicios(); alert("Servicio guardado");
+}
+function limpiarServ(){ ["s_nombre","s_precio","s_dias"].forEach(id=>document.getElementById(id).value=""); document.getElementById("s_tipo").value="mensualidad"; }
+function renderServicios(){
+  const list = LS.get("services",[]);
+  const rows = [`<tr><th>Servicio</th><th>$</th><th>Días</th><th>Tipo</th><th></th></tr>`,
+    ...list.map(s=>`<tr><td>${s.nombre}</td><td>$${s.precio}</td><td>${s.dias}</td><td>${s.tipo}</td>
+    <td><button class="pill" onclick="venderServicio('${s.nombre}')">Vender ahora</button></td></tr>`)];
+  document.getElementById("tblServ").innerHTML = rows.join("");
+}
+function venderServicio(nombre){
+  const s = LS.get("services",[]).find(x=>x.nombre===nombre);
+  if(!s) return;
+  state.carrito=[{tipo:'servicio',nombre:s.nombre,precio:s.precio,cant:1,sub:s.precio}];
+  document.querySelectorAll("#ventaTabs .chip").forEach(c=>c.classList.remove("active"));
+  document.querySelector("#ventaTabs .chip[data-tab='serv']").classList.add("active");
+  document.getElementById("ventaProd").classList.add("hidden");
+  document.getElementById("ventaServ").classList.remove("hidden");
+  nav("ventas"); renderCarritoMeta(); renderVentaServicios();
+}
+
+/* --------- MEMBRESÍAS --------- */
+function renderServiciosSelect(){
+  const list = LS.get("services",[]);
+  document.getElementById("m_serv").innerHTML = list.map(s=>`<option value="${s.nombre}">${s.nombre} ($${s.precio})</option>`).join("");
+}
+function registrarMembresia(){
+  const nombre = val("m_cliente"), serv = val("m_serv"), inicio = document.getElementById("m_inicio").value;
+  if(!nombre || !serv || !inicio){ alert("Completa cliente, servicio y fecha inicio"); return; }
+  const s = LS.get("services",[]).find(x=>x.nombre===serv);
+  if(!s){ alert("Servicio no encontrado"); return; }
+  let dias = s.dias||30;
+  if(s.tipo==="mensualidad") dias += 1; // 1 día de gracia solo mensualidades
+  const fin = new Date(inicio); fin.setDate(fin.getDate()+dias);
+  const membs = LS.get("memberships",[]);
+  membs.push({cliente:nombre, servicio:s.nombre, inicio, fin:fin.toISOString().substring(0,10), diasReal:s.dias, gracia: s.tipo==="mensualidad" ? 1 : 0 });
+  LS.set("memberships",membs);
+  renderMembresias(); alert("Membresía registrada");
+}
+function renderMembresias(){
+  const list = LS.get("memberships",[]);
+  const rows = [`<tr><th>Cliente</th><th>Servicio</th><th>Inicio</th><th>Fin</th><th>Gracia</th></tr>`,
+    ...list.map(m=>`<tr><td>${m.cliente}</td><td>${m.servicio}</td><td>${m.inicio}</td><td>${m.fin}</td><td>${m.gracia} día</td></tr>`)];
+  document.getElementById("tblMemb").innerHTML = rows.join("");
+}
+document.getElementById("m_inicio").onchange = ()=>{
+  const s = LS.get("services",[]).find(x=>x.nombre===val("m_serv"));
+  if(!s) return;
+  let dias = s.dias||30; if(s.tipo==="mensualidad") dias+=1;
+  const d = new Date(document.getElementById("m_inicio").value); d.setDate(d.getDate()+dias);
+  document.getElementById("m_fin").value = d.toISOString().substring(0,10);
+};
+
+/* --------- CLIENTES --------- */
+function guardarCliente(){
+  const c = {
+    nombre:val("c_nombre"), correo:val("c_correo"), peso:number("c_peso"),
+    edad:number("c_edad"), cert:val("c_cert"), pade:val("c_pade"), obs:val("c_obs")
+  };
+  if(!c.nombre){ alert("Nombre requerido"); return; }
+  const list = LS.get("clients",[]); list.push(c); LS.set("clients",list);
+  limpiarCliente(); renderClientes(); alert("Cliente guardado");
+}
+function limpiarCliente(){ ["c_nombre","c_correo","c_peso","c_edad","c_pade","c_obs"].forEach(id=>document.getElementById(id).value=""); document.getElementById("c_cert").value="No"; }
+function renderClientes(){
+  const list = LS.get("clients",[]);
+  const rows = [`<tr><th>Nombre</th><th>Correo</th><th>Peso</th><th>Edad</th><th>Cert.</th><th>Padecimientos</th><th>Obs</th></tr>`,
+    ...list.map(c=>`<tr><td>${c.nombre}</td><td>${c.correo||""}</td><td>${c.peso||""}</td><td>${c.edad||""}</td><td>${c.cert}</td><td>${c.pade||""}</td><td>${c.obs||""}</td></tr>`)];
+  document.getElementById("tblClientes").innerHTML = rows.join("");
+}
+
+/* --------- REPORTES --------- */
+function renderReportes(){
+  const sales = LS.get("sales",[]);
+  const today = new Date().toDateString();
+  const total = sales.reduce((a,s)=>a+s.total,0);
+  const totHoy = sales.filter(s=>new Date(s.ts).toDateString()===today).reduce((a,s)=>a+s.total,0);
+  document.getElementById("r_total").textContent = money(total);
+  document.getElementById("r_hoy").textContent = money(totHoy);
+  // Por pago
+  const porPago = {};
+  ["Efectivo","Tarjeta","Transferencia"].forEach(p=>porPago[p]=0);
+  sales.forEach(s=>porPago[s.pago]=(porPago[s.pago]||0)+s.total);
+  document.getElementById("r_pago").innerHTML = ["<tr><th>Pago</th><th>Ingreso</th></tr>",
+    ...Object.entries(porPago).map(([k,v])=>`<tr><td>${k}</td><td>${money(v)}</td></tr>`)
+  ].join("");
+  // Top productos + servicios
+  const tally = {};
+  sales.forEach(s=>s.items.forEach(i=>{
+    const key = i.tipo+":"+ (i.nombre || i.sku);
+    tally[key] = (tally[key]||0) + 1;
+  }));
+  const rows = Object.entries(tally).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .map(([k,c])=>{
+      const [tipo,nombre] = k.split(":");
+      return `<tr><td>${nombre}</td><td>${c}</td><td>${tipo}</td></tr>`;
+    });
+  document.getElementById("r_top").innerHTML = ["<tr><th>Producto/Servicio</th><th>Cant</th><th>Tipo</th></tr>",...rows].join("");
+}
+
+/* --------- HELPERS --------- */
+function val(id){ return document.getElementById(id).value }
+function number(id){ return parseFloat(document.getElementById(id).value||"0") }
+function money(n){ return "$"+(n||0).toFixed(2) }
+
+/* Init */
+nav('menu');
+</script>
 </body>
 </html>

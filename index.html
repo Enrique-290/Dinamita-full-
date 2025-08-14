@@ -1,289 +1,224 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DINÁMITA POS — Catálogo Compacto</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DINÁMITA POS — Catálogo compacto</title>
 <style>
   :root{
-    --rojo:#e11d2e;
-    --negro:#111;
-    --gris:#f6f7f9;
+    --rojo:#dc2626;
+    --negro:#111827;
+    --gris:#f3f4f6;
     --borde:#e5e7eb;
+    --morado:#6d28d9;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-    background:#fff;
-    color:#111827;
-  }
-  header{
-    position:sticky; top:0; z-index:10;
-    background:#fff; border-bottom:1px solid var(--borde);
-    padding:12px 16px;
-    display:flex; gap:12px; align-items:center; justify-content:space-between;
-  }
-  .marca{font-weight:800; letter-spacing:.5px}
-  .marca span{color:var(--rojo)}
-  .search{
-    flex:1; max-width:520px; display:flex; gap:8px; align-items:center;
-    border:1px solid var(--borde); border-radius:12px; padding:8px 12px; background:#fff;
-  }
-  .search input{
-    flex:1; font-size:16px; border:0; outline:0; background:transparent;
-  }
-  main{padding:16px; padding-bottom:110px;}
-  .grid{
-    display:grid; gap:10px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  /* Tablet / Desktop: más columnas */
-  @media (min-width: 720px){ .grid{grid-template-columns: repeat(5, minmax(0,1fr));} }
-  @media (min-width: 1024px){ .grid{grid-template-columns: repeat(6, minmax(0,1fr));} }
-
-  .card{
-    border:1px solid var(--borde);
-    border-radius:14px; padding:10px; background:#fff;
-    display:flex; flex-direction:column; align-items:center; gap:8px;
-    transition:box-shadow .15s ease, transform .05s;
-  }
-  .card:hover{ box-shadow:0 6px 20px rgba(0,0,0,.06); transform:translateY(-1px); }
-  .thumb{
-    width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
-    background:var(--gris); border-radius:10px; overflow:hidden;
-  }
-  .thumb img{
-    height:100px; width:auto; object-fit:contain; /* imagen compacta */
-  }
-  .name{width:100%; font-weight:600; font-size:14px; line-height:1.2; min-height:34px;}
-  .price{width:100%; font-weight:800; color:#111; font-size:14px;}
-  .add{
-    width:100%; border:0; cursor:pointer; border-radius:10px; padding:8px 10px;
-    background:var(--rojo); color:#fff; font-weight:700; font-size:14px;
-  }
-  .add:active{transform:scale(.98)}
-  /* Barra de carrito */
-  .cartbar{
-    position:fixed; left:0; right:0; bottom:0; z-index:20;
-    background:#fff; border-top:1px solid var(--borde);
-    padding:10px 12px; display:flex; gap:10px; align-items:center;
-  }
-  .cart-summary{flex:1; font-weight:700}
-  .pay{background:var(--rojo); color:#fff; border:0; border-radius:12px; padding:12px 16px; font-weight:800; font-size:16px}
-  .viewcart{background:#fff; border:1px solid var(--borde); border-radius:12px; padding:10px 14px; font-weight:700}
-  /* Drawer carrito */
-  .drawer{
-    position:fixed; left:0; right:0; bottom:70px; z-index:30;
-    margin: 0 10px; border:1px solid var(--borde); border-radius:14px;
-    background:#fff; box-shadow:0 12px 30px rgba(0,0,0,.10); display:none;
-  }
-  .drawer.open{display:block;}
-  .drawer header{border-bottom:1px solid var(--borde); border-radius:14px 14px 0 0}
-  .drawer .content{max-height:45vh; overflow:auto; padding:12px}
-  .linea{display:grid; grid-template-columns: 1fr auto auto auto; gap:10px; padding:10px 0; border-bottom:1px solid var(--borde); align-items:center}
-  .qtybox{display:flex; gap:8px; align-items:center}
-  .btnx{width:28px; height:28px; border:1px solid var(--borde); background:#fff; border-radius:8px; font-weight:800}
-  .trash{border:1px solid var(--borde); background:#fff; border-radius:8px; padding:6px 10px}
-  /* Modal ticket */
-  .modal{
-    position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:40;
-  }
-  .modal.open{display:flex;}
-  .ticket{
-    width:min(540px, 94vw); background:#fff; border-radius:14px; border:1px solid var(--borde);
-    padding:16px;
-  }
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;background:#fff;color:#111}
+  header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--borde);z-index:10}
+  .top{display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .logo{width:36px;height:36px;border-radius:8px;background:var(--negro);display:grid;place-items:center;color:#fff;font-weight:700}
+  .brand{font-weight:800;letter-spacing:.5px}
+  .pill{margin-left:auto;font-size:12px;color:var(--rojo);font-weight:700}
+  .search{padding:8px 16px;display:flex;gap:12px}
+  .search input{flex:1;padding:10px 12px;border:1px solid var(--borde);border-radius:10px}
+  .wrap{max-width:1100px;margin:0 auto;padding:12px 16px 96px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+  .card{border:1px solid var(--borde);border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:box-shadow .15s}
+  .card:hover{box-shadow:0 6px 20px rgba(0,0,0,.06)}
+  .thumb{width:96px;height:96px;object-fit:contain}
+  .name{font-size:13px;font-weight:600;text-align:center;min-height:34px}
+  .price{font-size:13px;color:#111;font-weight:700}
+  .btn{cursor:pointer;background:var(--morado);color:#fff;border:none;border-radius:10px;padding:8px 10px;width:100%;font-weight:700}
+  .btn:active{transform:scale(.98)}
+  /* cart bar */
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--borde);padding:10px 12px;display:flex;align-items:center;gap:10px}
+  .bar .total{margin-left:auto;font-weight:800}
+  .bar .final{background:var(--rojo)}
+  .cart-panel{position:fixed;left:0;right:0;bottom:56px;background:#fff;border-top:1px solid var(--borde);max-height:40vh;overflow:auto;display:none}
+  .cart-row{display:grid;grid-template-columns:30px 1fr 80px 90px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--borde)}
+  .qtybtn{width:28px;height:28px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+  .trash{border:1px solid var(--borde);border-radius:8px;padding:6px 8px;background:#fff;margin-left:6px}
+  .muted{color:#6b7280;font-size:12px}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+  dialog{border:none;border-radius:16px;padding:0;max-width:520px;width:92%}
+  .ticket{padding:18px 18px 10px}
   .ticket h3{margin:0 0 8px 0}
-  .ticket table{width:100%; border-collapse:collapse; font-size:14px}
-  .ticket th,.ticket td{padding:8px 6px; border-bottom:1px solid var(--borde); text-align:left}
-  .ticket tfoot td{font-weight:800}
-  .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
-  .btn{border:1px solid var(--borde); background:#fff; border-radius:10px; padding:10px 12px; font-weight:700}
-  .btn.primary{background:var(--rojo); color:#fff; border-color:var(--rojo)}
-  .hint{color:#6b7280; font-size:12px}
+  .trow{display:grid;grid-template-columns:1fr 90px;gap:8px;padding:6px 0;border-bottom:1px dashed var(--borde)}
+  .actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px 16px}
+  .secondary{background:#111827;color:#fff}
+  .small{font-size:12px}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="marca">DINÁMITA <span>POS</span></div>
-  <div class="search">
-    🔎
-    <input id="q" type="search" placeholder="Buscar producto o SKU…" />
-  </div>
-</header>
-
-<main>
-  <div id="grid" class="grid"></div>
-</main>
-
-<!-- Drawer carrito -->
-<section id="drawer" class="drawer" aria-hidden="true">
-  <header style="border:0; padding:12px 16px;">
-    <strong>Carrito</strong>
-  </header>
-  <div class="content" id="cartLines"></div>
-</section>
-
-<!-- Barra de carrito -->
-<section class="cartbar">
-  <button id="toggleCart" class="viewcart">Ver carrito</button>
-  <div class="cart-summary"><span id="itemsCount">0</span> ítems — <strong id="total">$0.00</strong></div>
-  <button id="pay" class="pay">Finalizar venta</button>
-</section>
-
-<!-- Modal Ticket -->
-<section id="modal" class="modal" aria-hidden="true">
-  <div class="ticket">
-    <h3>DINÁMITA GYM — Ticket</h3>
-    <div class="hint" id="modalHint">Modo seguro: sólo compartir/cerrar.</div>
-    <table id="ticketTable">
-      <thead><tr><th>Concepto</th><th>Cant</th><th>$</th></tr></thead>
-      <tbody></tbody>
-      <tfoot><tr><td>Total</td><td></td><td id="ticketTotal">$0.00</td></tr></tfoot>
-    </table>
-    <div class="actions">
-      <button class="btn" id="closeModal">Cerrar</button>
-      <button class="btn primary" id="shareBtn">Compartir total</button>
+  <header>
+    <div class="top">
+      <div class="logo">💥</div>
+      <div class="brand">DINÁMITA <span style="color:var(--rojo)">POS</span></div>
+      <div class="pill">Modo Seguro (sin impresora)</div>
     </div>
+    <div class="search">
+      <input id="query" placeholder="Buscar producto por nombre o SKU...">
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="grid" class="grid"></div>
   </div>
-</section>
+
+  <div id="cartPanel" class="cart-panel"></div>
+  <div class="bar">
+    <button id="toggleCart" class="btn secondary small">Ver carrito</button>
+    <select id="metodo">
+      <option>Efectivo</option>
+      <option>Tarjeta</option>
+      <option>Transferencia</option>
+    </select>
+    <div class="total">$<span id="total">0.00</span></div>
+    <button id="finalBtn" class="btn final">Finalizar venta</button>
+  </div>
+
+  <dialog id="dlg">
+    <div class="ticket">
+      <h3>DINÁMITA GYM — Ticket</h3>
+      <div class="muted small" id="ticketMeta"></div>
+      <div id="ticketRows"></div>
+      <div class="trow" style="font-weight:800"><div>Total</div><div id="ticketTotal" style="text-align:right"></div></div>
+      <div class="muted small" style="padding-top:8px">Gracias por tu compra 💥</div>
+    </div>
+    <div class="actions">
+      <button id="shareBtn" class="btn small">Compartir total</button>
+      <button id="closeBtn" class="btn secondary small">Cerrar</button>
+    </div>
+  </dialog>
 
 <script>
-const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="#f2f3f5"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9aa0a6" font-family="Arial" font-size="14">Sin imagen</text></svg>`);
-
 const productos = [
-  { sku:'758104001972', nombre:'Agua Bonafont 1L', precio:14, img:PLACEHOLDER },
-  { sku:'758104000159', nombre:'Agua Bonafont 2L', precio:20, img:PLACEHOLDER },
-  { sku:'758104005796', nombre:'Agua Bonafont 1.5L', precio:16, img:PLACEHOLDER },
-  { sku:'0237433',        nombre:'Gatorade 1L', precio:26, img:PLACEHOLDER },
-  { sku:'037617310649',   nombre:'Gatorade 600ml', precio:20, img:PLACEHOLDER },
-  { sku:'7503027753',     nombre:'Volt Blue', precio:22, img:PLACEHOLDER },
-  { sku:'7503027753Y',    nombre:'Volt Yellow', precio:22, img:PLACEHOLDER },
-  { sku:'7503027753P',    nombre:'Volt Pink', precio:22, img:PLACEHOLDER },
-  { sku:'ELECTROLIT',     nombre:'Electrolit', precio:25, img:PLACEHOLDER },
-  { sku:'TPW',            nombre:'T Proteína Whey', precio:25, img:PLACEHOLDER },
-  { sku:'TPM',            nombre:'T Proteína Mass', precio:35, img:PLACEHOLDER },
-  { sku:'OX',             nombre:'Óxido', precio:25, img:PLACEHOLDER },
+  {sku:"0237433", nombre:"Agua Bonafont 1L", precio:14, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"758104000159", nombre:"Agua Bonafont 2L", precio:20, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"758104005796", nombre:"Agua Bonafont 1.5L", precio:16, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"036171310649", nombre:"Gatorade 600ml", precio:20, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"0237433A", nombre:"Gatorade 1L", precio:26, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"7503027753", nombre:"Volt Blue", precio:22, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect width='80' height='140' x='20' y='10' rx='12' fill='#1f2937'/>  <rect width='80' height='18' x='20' y='10' rx='9' fill='#374151'/>  <text x='60' y='92' font-size='24' fill='#ffffff' text-anchor='middle' font-family='Arial'>VOLT</text></svg>"},
+  {sku:"7503027753Y", nombre:"Volt Yellow", precio:22, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect width='80' height='140' x='20' y='10' rx='12' fill='#1f2937'/>  <rect width='80' height='18' x='20' y='10' rx='9' fill='#374151'/>  <text x='60' y='92' font-size='24' fill='#ffffff' text-anchor='middle' font-family='Arial'>VOLT</text></svg>"},
+  {sku:"7503027753P", nombre:"Volt Pink", precio:22, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect width='80' height='140' x='20' y='10' rx='12' fill='#1f2937'/>  <rect width='80' height='18' x='20' y='10' rx='9' fill='#374151'/>  <text x='60' y='92' font-size='24' fill='#ffffff' text-anchor='middle' font-family='Arial'>VOLT</text></svg>"},
+  {sku:"ELECTROLIT", nombre:"Electrolit", precio:25, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='45' y='10' width='30' height='18' rx='4' fill='#0ea5e9'/>  <rect x='36' y='28' width='48' height='110' rx='8' fill='#93c5fd'/>  <rect x='36' y='65' width='48' height='5' fill='#60a5fa' />  <rect x='36' y='95' width='48' height='5' fill='#60a5fa' /></svg>"},
+  {sku:"TPW", nombre:"T Proteína Whey", precio:25, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='20' y='30' width='80' height='110' rx='10' fill='#111827'/>  <rect x='20' y='20' width='80' height='20' rx='6' fill='#374151'/>  <text x='60' y='90' font-size='18' fill='#ef4444' text-anchor='middle' font-family='Arial'>PRO</text></svg>"},
+  {sku:"TPM", nombre:"T Proteína Mass", precio:35, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>  <rect x='20' y='30' width='80' height='110' rx='10' fill='#111827'/>  <rect x='20' y='20' width='80' height='20' rx='6' fill='#374151'/>  <text x='60' y='90' font-size='18' fill='#ef4444' text-anchor='middle' font-family='Arial'>PRO</text></svg>"},
+  {sku:"BARRA", nombre:"Deli barras", precio:25, img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'>  <rect x='10' y='40' width='140' height='40' rx='8' fill='#f59e0b'/>  <rect x='10' y='40' width='30' height='40' rx='8' fill='#e11d48'/>  <rect x='120' y='40' width='30' height='40' rx='8' fill='#e11d48'/>  <text x='80' y='67' font-size='16' fill='#111827' text-anchor='middle' font-family='Arial'>BARRA</text></svg>"}
 ];
 
 const grid = document.getElementById('grid');
-const q    = document.getElementById('q');
-
-const drawer = document.getElementById('drawer');
-const cartLines = document.getElementById('cartLines');
-const toggleCartBtn = document.getElementById('toggleCart');
-
-const itemsCount = document.getElementById('itemsCount');
-const totalSpan  = document.getElementById('total');
-
-const modal = document.getElementById('modal');
-const ticketTableBody = document.querySelector('#ticketTable tbody');
+const query = document.getElementById('query');
+const cartPanel = document.getElementById('cartPanel');
+const totalEl = document.getElementById('total');
+const dlg = document.getElementById('dlg');
+const ticketRows = document.getElementById('ticketRows');
 const ticketTotal = document.getElementById('ticketTotal');
-const closeModalBtn = document.getElementById('closeModal');
-const shareBtn = document.getElementById('shareBtn');
+const ticketMeta = document.getElementById('ticketMeta');
 
-let carrito = {}; // {sku: {sku,nombre,precio,qty}}
-
-function money(n){ return '$' + n.toFixed(2); }
+let carrito = []; // { sku, nombre, precio, cant }
 
 function renderGrid(list){
   grid.innerHTML = '';
   list.forEach(p => {
-    const card = document.createElement('article');
+    const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <div class="thumb"><img src="${p.img || PLACEHOLDER}" alt="${p.nombre}" onerror="this.src='${PLACEHOLDER}'"></div>
+      <img class="thumb" alt="" src="${p.img}">
       <div class="name">${p.nombre}</div>
-      <div class="price">${money(p.precio)}</div>
-      <button class="add">Agregar</button>
+      <div class="price">$${p.precio.toFixed(2)} MXN</div>
+      <button class="btn">Agregar</button>
     `;
-    card.querySelector('.add').addEventListener('click', () => addToCart(p));
+    card.querySelector('.btn').onclick = () => addToCart(p);
     grid.appendChild(card);
   });
 }
 
-function addToCart(p){
-  const line = carrito[p.sku] || { ...p, qty:0 };
-  line.qty += 1;
-  carrito[p.sku] = line;
-  refreshCartUI();
+function addToCart(prod){
+  const i = carrito.findIndex(x => x.sku === prod.sku);
+  if(i>=0) carrito[i].cant += 1;
+  else carrito.push({sku:prod.sku,nombre:prod.nombre,precio:prod.precio,cant:1});
+  refreshCart();
 }
 
-function refreshCartUI(){
-  const items = Object.values(carrito);
-  const count = items.reduce((a,b)=>a+b.qty,0);
-  const total = items.reduce((a,b)=>a + b.qty*b.precio,0);
-  itemsCount.textContent = count;
-  totalSpan.textContent = money(total);
-
-  cartLines.innerHTML = items.length ? '' : '<div style="padding:12px;color:#6b7280">Carrito vacío</div>';
-  items.forEach(line=>{
+function refreshCart(){
+  cartPanel.style.display = carrito.length ? 'block':'none';
+  cartPanel.innerHTML = '';
+  let sum = 0;
+  carrito.forEach(item => {
+    sum += item.precio * item.cant;
     const row = document.createElement('div');
-    row.className = 'linea';
+    row.className = 'cart-row';
     row.innerHTML = `
-      <div><strong>${line.nombre}</strong><div class="hint">${line.sku}</div></div>
-      <div class="qtybox">
-        <button class="btnx menos">–</button>
-        <div>${line.qty}x</div>
-        <button class="btnx mas">+</button>
-      </div>
-      <div><strong>${money(line.qty*line.precio)}</strong></div>
-      <button class="trash">🗑</button>
-    `;
-    row.querySelector('.menos').onclick = () => { line.qty=Math.max(0,line.qty-1); if(!line.qty) delete carrito[line.sku]; refreshCartUI(); };
-    row.querySelector('.mas').onclick   = () => { line.qty+=1; refreshCartUI(); };
-    row.querySelector('.trash').onclick = () => { delete carrito[line.sku]; refreshCartUI(); };
-    cartLines.appendChild(row);
+      <div>${item.cant}×</div>
+      <div>${item.nombre}</div>
+      <div style="text-align:right">$${(item.precio*item.cant).toFixed(2)}</div>
+      <div style="text-align:right">
+        <button class="qtybtn" aria-label="menos">-</button>
+        <button class="qtybtn" aria-label="mas">+</button>
+        <button class="trash" aria-label="borrar">🗑️</button>
+      </div>`;
+    const [menos, mas, borrar] = row.querySelectorAll('button');
+    menos.onclick = () => { item.cant = Math.max(0,item.cant-1); if(item.cant===0) remove(item.sku); refreshCart(); };
+    mas.onclick = () => { item.cant += 1; refreshCart(); };
+    borrar.onclick = () => { remove(item.sku); refreshCart(); };
+    cartPanel.appendChild(row);
   });
+  totalEl.textContent = sum.toFixed(2);
 }
 
-q.addEventListener('input', ()=>{
-  const term = q.value.trim().toLowerCase();
-  const filtered = term
-    ? productos.filter(p => (p.nombre + ' ' + p.sku).toLowerCase().includes(term))
-    : productos;
-  renderGrid(filtered);
-});
+function remove(sku){ carrito = carrito.filter(x => x.sku !== sku); }
 
-toggleCartBtn.addEventListener('click', ()=>{
-  drawer.classList.toggle('open');
-});
-
-document.getElementById('pay').addEventListener('click', ()=>{
-  const items = Object.values(carrito);
-  if(!items.length){ alert('Agrega productos al carrito.'); return; }
-  ticketTableBody.innerHTML = '';
-  let total = 0;
-  items.forEach(l=>{
-    total += l.qty*l.precio;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${l.nombre}</td><td>${l.qty}</td><td>${money(l.qty*l.precio)}</td>`;
-    ticketTableBody.appendChild(tr);
-  });
-  ticketTotal.textContent = money(total);
-  modal.classList.add('open');
-});
-
-closeModalBtn.onclick = ()=> { modal.classList.remove('open'); };
-
-shareBtn.onclick = async ()=>{
-  const items = Object.values(carrito);
-  const lines = items.map(l=> `${l.qty}x ${l.nombre} – ${money(l.qty*l.precio)}`).join('\\n');
-  const total = items.reduce((a,b)=>a + b.qty*b.precio,0);
-  const text = `DINÁMITA GYM — Ticket\\n${lines}\\nTotal: ${money(total)}\\nGracias por tu compra 💥`;
-  try{
-    if(navigator.share){ await navigator.share({ text }); }
-    else{
-      await navigator.clipboard.writeText(text);
-      alert('Ticket copiado al portapapeles.');
-    }
-  }catch(e){}
+document.getElementById('toggleCart').onclick = () => {
+  cartPanel.style.display = (cartPanel.style.display==='none' || !cartPanel.style.display) ? 'block' : 'none';
 };
 
+query.addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  const list = productos.filter(p => 
+     p.nombre.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+  renderGrid(list);
+});
+
+document.getElementById('finalBtn').onclick = () => {
+  if(!carrito.length) return;
+  // render ticket
+  ticketRows.innerHTML = '';
+  let sum = 0;
+  carrito.forEach(i => {
+    const tr = document.createElement('div');
+    tr.className = 'trow';
+    tr.innerHTML = `<div>${i.cant}× ${i.nombre}</div><div style="text-align:right">$${(i.cant*i.precio).toFixed(2)}</div>`;
+    ticketRows.appendChild(tr);
+    sum += i.cant*i.precio;
+  });
+  ticketTotal.textContent = '$' + sum.toFixed(2);
+  const dt = new Date();
+  ticketMeta.textContent = dt.toLocaleString('es-MX') + ' · ' + document.getElementById('metodo')?.value;
+  dlg.showModal();
+};
+
+document.getElementById('closeBtn').onclick = () => {
+  dlg.close();
+  // vaciar carrito después de cerrar ticket
+  carrito = [];
+  refreshCart();
+};
+
+document.getElementById('shareBtn').onclick = async () => {
+  const total = totalEl.textContent;
+  const texto = `DINÁMITA GYM — Total: $${total} MXN`;
+  if(navigator.share) {
+    try { await navigator.share({title:'Ticket', text:texto}); } catch(e){}
+  } else {
+    try { await navigator.clipboard.writeText(texto); alert('Total copiado'); } catch(e) { alert(texto); }
+  }
+};
+
+// init
 renderGrid(productos);
-refreshCartUI();
+refreshCart();
 </script>
 </body>
 </html>

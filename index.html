@@ -1,207 +1,280 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>DINÁMITA POS — Catálogo (compacto)</title>
 <style>
-  :root{
-    --brand:#e11d48; /* rojo */
-    --accent:#6d28d9; /* morado para botones Agregar */
-    --bg:#ffffff; --text:#111827; --muted:#6b7280; --line:#e5e7eb;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
-  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:saturate(180%) blur(6px);border-bottom:1px solid var(--line)}
-  .wrap{max-width:980px;margin:0 auto;padding:12px 16px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
-  .dot{width:22px;height:22px;border-radius:6px;background:radial-gradient(circle at 35% 35%, #ffbf00, #ff7a00 60%, #9a3412); box-shadow:0 0 0 2px #0001 inset}
-  .sub{margin-left:auto;color:#991b1b;font-weight:700}
-  .search{margin:8px 0 12px}
-  .search input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:16px;box-shadow:0 1px 0 #00000008 inset}
-  /* grid */
-  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px 16px;max-width:980px;margin:0 auto 80px}
-  @media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
-  @media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
-  .card{border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 0 #00000008;background:#fff}
-  .thumb{width:100%;aspect-ratio:1/1;border-radius:12px;border:1px dashed #ddd;background:#fafafa url('data:image/svg+xml;utf8,  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="%239aa5b1" stroke-width="1.5">  <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 16l5-5 4 4 2-2 7 7"/><circle cx="9" cy="8" r="2"/></svg>') center/64px 64px no-repeat;}
-  .title{font-weight:700;font-size:15px;min-height:36px}
-  .price{color:#111;font-weight:800}
-  .meta{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px}
-  .btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-weight:700}
-  .btn:active{transform:translateY(1px)}
-  /* sticky bar */
-  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:8px;align-items:center;z-index:40}
-  .bar .pill{background:#111827;color:#fff;padding:10px 14px;border-radius:999px;font-weight:700}
-  .select{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
-  .total{margin-left:auto;font-weight:900}
-  .pay{background:var(--brand);border-radius:12px;color:#fff;border:none;font-weight:900;padding:12px 16px}
-  /* drawer */
-  .drawer{position:fixed;left:0;right:0;bottom:-100%;transition:bottom .25s ease;z-index:50}
-  .drawer.open{bottom:0}
-  .sheet{background:#fff;border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -10px 30px rgba(0,0,0,.15);max-height:70vh;overflow:auto;border-top:1px solid var(--line)}
-  .sheet header{position:sticky;top:0;border-bottom:1px solid var(--line);background:#fff}
-  .cart-item{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
-  .qty{display:flex;align-items:center;gap:6px}
-  .iconbtn{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:900}
-  .trash{opacity:.6}
-  .muted{color:var(--muted);font-size:12px}
-  /* ticket */
-  dialog{border:none;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:0}
-  .ticket{padding:16px 18px;min-width:320px;max-width:92vw}
-  .ticket h3{margin:0 0 6px}
-  .ticket table{width:100%;border-collapse:collapse}
-  .ticket td{padding:6px 0;border-bottom:1px dashed #ddd}
-  .ticket tfoot td{font-weight:900;border-top:1px solid #000}
-  .actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line);background:#fafafa;border-bottom-left-radius:14px;border-bottom-right-radius:14px}
+:root{
+  --bg:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --brand:#e10600; /* rojo */
+  --brand-2:#111;  /* negro */
+  --surface:#f6f7f9;
+  --card:#fff;
+  --shadow:0 6px 18px rgba(0,0,0,.08);
+  --radius:16px;
+  --gap:14px;
+  --btn:#5b3df5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
+header{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);padding:12px 16px;border-bottom:1px solid #eee;
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;}
+.logo .dot{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#ff3b30,#ff9500);box-shadow:0 4px 12px rgba(255,59,48,.35)}
+.tag{color:#b00020;font-size:12px;line-height:1.1}
+.search{flex:1;max-width:820px}
+.search input{
+  width:100%;padding:12px 14px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;
+  font-size:15px;outline:0;
+}
+.container{padding:16px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--gap);
+}
+/* Small phones preferred height for the bottom sheet */
+:root{ --sheetH: 34vh; --sheetPeek: 58px; }
+
+/* Moto Edge 50 Fusion (~393x852 dp) */
+@media (min-width:375px){
+  :root{ --sheetH: 32vh; }
+}
+
+/* Lenovo M9 portrait (~800x1340 dp) */
+@media (min-width:750px){
+  .grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  :root{ --sheetH: 28vh; --sheetPeek: 60px; }
+}
+
+/* Lenovo M11 portrait / tablets */
+@media (min-width:980px){
+  .grid{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+  :root{ --sheetH: 26vh; --sheetPeek: 64px; }
+}
+
+/* landscape tablets / desktop */
+@media (min-width:1200px){
+  .grid{ grid-template-columns:repeat(6,minmax(0,1fr)); }
+  :root{ --sheetH: 24vh; --sheetPeek: 64px; }
+}
+
+.card{
+  background:var(--card);border:1px solid #ececec;border-radius:var(--radius);box-shadow:var(--shadow);
+  overflow:hidden;display:flex;flex-direction:column;min-height:200px;
+}
+.thumb{display:flex;align-items:center;justify-content:center;background:var(--surface);height:120px}
+.thumb img{width:70px;height:70px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.08))}
+.info{padding:12px}
+.title{font-weight:650;margin:2px 0 4px 0;font-size:15px}
+.price{color:#2b6;padding-bottom:8px;font-weight:700}
+.btn{display:block;width:100%;text-align:center;background:var(--btn);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
+.btn:active{transform:translateY(1px)}
+
+/* Bottom sheet cart */
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  transition:transform .22s ease, height .22s ease;
+  transform:translateY(calc( var(--sheetH) - var(--sheetPeek) ));
+  height:var(--sheetH);
+  background:rgba(255,255,255,.92);backdrop-filter:saturate(140%) blur(10px);
+  border-top-left-radius:18px;border-top-right-radius:18px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.12);
+}
+.sheet.open{ transform:translateY(0); }
+.sheet .handle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid #eaeaea;
+}
+.sheet .handle .bar{width:42px;height:5px;border-radius:99px;background:#ddd;margin:0 auto}
+.sheet .list{padding:10px 12px;height:calc(100% - 106px);overflow:auto}
+.item{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed #eee}
+.qtyctl{display:flex;gap:8px}
+.badge{font-weight:700;color:#555}
+.small{font-size:13px;color:#444}
+.kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f1f1f1;border:1px solid #e1e1e1;border-bottom-width:2px;border-radius:6px;padding:2px 6px}
+.sheet .footer{
+  display:flex;gap:10px;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-top:1px solid #eaeaea;background:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:18px;
+}
+.select{padding:8px 10px;border-radius:10px;border:1px solid #ddd}
+.pay{background:var(--brand);border-radius:12px;color:#fff;font-weight:800;border:none;padding:12px 14px}
+/* Safe area for phones with gesture bar */
+@supports(padding: max(0px)){
+  .sheet{ padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+}
+.hideOnScroll{ transform:translateY(100%); }
+/* Toast */
+.toast{
+  position:fixed;bottom:calc(var(--sheetPeek) + 10px);left:50%;transform:translateX(-50%);
+  background:#111;color:#fff;padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s ease;
+}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap brand">
-    <div class="dot"></div> DINÁMITA <span style="color:var(--brand)">POS</span>
-    <div class="sub">Modo Seguro (sin impresora)</div>
-  </div>
-  <div class="wrap search"><input id="q" placeholder="Buscar producto por nombre o SKU..."></div>
+  <div class="logo"><div class="dot"></div> DINÁMITA <span style="color:var(--brand)">POS</span></div>
+  <div class="tag">Modo Seguro<br><span style="color:#777">(sin impresora)</span></div>
+  <div class="search"><input id="q" placeholder="Buscar producto por nombre o SKU…"/></div>
 </header>
 
-<main class="grid" id="grid"></main>
-
-<!-- Sticky bar -->
-<div class="bar">
-  <button class="pill" id="toggleCart">Ver carrito</button>
-  <select id="payment" class="select">
-    <option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option>
-  </select>
-  <div class="total" id="total">$0.00</div>
-  <button class="pay" id="checkout">Finalizar venta</button>
+<div class="container">
+  <div id="grid" class="grid"></div>
 </div>
 
-<!-- Drawer -->
-<div class="drawer" id="drawer">
-  <div class="sheet">
-    <header class="wrap" style="display:flex;align-items:center;gap:10px;justify-content:space-between">
-      <strong>Carrito</strong>
-      <button id="closeCart" class="iconbtn">✕</button>
-    </header>
-    <div id="cart"></div>
+<!-- Bottom sheet Cart -->
+<div id="sheet" class="sheet">
+  <div class="handle">
+    <span class="kbd">↑</span><span class="small">Desliza o toca para ver carrito</span>
+    <div class="bar"></div>
+    <button id="toggle" class="kbd">Cerrar</button>
+  </div>
+  <div class="list" id="cartList"></div>
+  <div class="footer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <select id="pay" class="select">
+        <option>Efectivo</option>
+        <option>Tarjeta</option>
+        <option>Transferencia</option>
+      </select>
+      <strong id="total" style="font-size:18px">$0.00</strong>
+    </div>
+    <button class="pay" id="finish">Finalizar venta</button>
   </div>
 </div>
 
-<dialog id="dlg">
-  <div class="ticket">
-    <h3>DINÁMITA GYM — Ticket</h3>
-    <div class="muted" id="dt"></div>
-    <table id="tt"></table>
-  </div>
-  <div class="actions">
-    <button id="copy" class="btn" style="background:#111827">Compartir total</button>
-    <button id="ok" class="pay">Cerrar</button>
-  </div>
-</dialog>
+<div id="toast" class="toast">Agregado al carrito</div>
 
 <script>
-const productos = [
-  { sku:'7503027753', nombre:'Volt Blue', precio:22, stock:20 },
-  { sku:'7503027753Y', nombre:'Volt Yellow', precio:22, stock:20 },
-  { sku:'7503027753P', nombre:'Volt Pink', precio:22, stock:20 },
-  { sku:'0237433', nombre:'Gatorade 1L', precio:26, stock:20 },
-  { sku:'037617310649', nombre:'Gatorade 600ml', precio:20, stock:20 },
-  { sku:'ELECTROLIT', nombre:'Electrolit', precio:25, stock:20 },
-  { sku:'TPW', nombre:'T Proteína Whey', precio:25, stock:20 },
-  { sku:'TPM', nombre:'T Proteína Mass', precio:35, stock:20 },
-  { sku:'OX', nombre:'Óxido', precio:25, stock:20 },
-  { sku:'758104005796', nombre:'Agua Bonafont 1.5L', precio:16, stock:20 },
-  { sku:'758104000159', nombre:'Agua Bonafont 2L', precio:20, stock:20 },
-  { sku:'758104001972', nombre:'Agua Bonafont 1L', precio:14, stock:20 },
+const DATA = [
+  {sku:"758104001972", nombre:"Agua Bonafont 1L", precio:14, img:""},
+  {sku:"758104000159", nombre:"Agua Bonafont 2L", precio:20, img:""},
+  {sku:"758104005796", nombre:"Agua Bonafont 1.5L", precio:16, img:""},
+  {sku:"0237433", nombre:"Gatorade 1L", precio:26, img:""},
+  {sku:"037617310649", nombre:"Gatorade 600ml", precio:20, img:""},
+  {sku:"7503027753", nombre:"Volt Blue", precio:22, img:""},
+  {sku:"7503027753Y", nombre:"Volt Yellow", precio:22, img:""},
+  {sku:"7503027753P", nombre:"Volt Pink", precio:22, img:""},
+  {sku:"ELECTROLIT", nombre:"Electrolit", precio:25, img:""},
+  {sku:"TPW", nombre:"T Proteína Whey", precio:25, img:""},
+  {sku:"TPM", nombre:"T Proteína Mass", precio:35, img:""},
+  {sku:"OX", nombre:"Óxido", precio:25, img:""}
 ];
 
-const grid = document.getElementById('grid');
-const q = document.getElementById('q');
-const drawer = document.getElementById('drawer');
-const cartView = document.getElementById('cart');
-const totalEl = document.getElementById('total');
-const payment = document.getElementById('payment');
-const dlg = document.getElementById('dlg');
-const tt = document.getElementById('tt');
-const dt = document.getElementById('dt');
+let cart = {}; // sku -> {qty, item}
 
-let carrito = {};
+const $grid = document.getElementById('grid');
+const $q = document.getElementById('q');
+const $sheet = document.getElementById('sheet');
+const $toggle = document.getElementById('toggle');
+const $cartList = document.getElementById('cartList');
+const $total = document.getElementById('total');
+const $finish = document.getElementById('finish');
+const $toast = document.getElementById('toast');
 
-function renderGrid(list){
-  grid.innerHTML = '';
-  list.forEach(p=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML = `
-      <div class="thumb" aria-hidden="true"></div>
-      <div class="title">${p.nombre}</div>
-      <div class="meta"><span class="price">$${p.precio.toFixed(2)} MXN</span><span>Stock ${p.stock}</span></div>
-      <button class="btn">Agregar</button>
-    `;
-    card.querySelector('.btn').onclick = ()=> addToCart(p);
-    grid.appendChild(card);
+function money(n){ return "$"+n.toFixed(2); }
+
+function renderGrid(items){
+  $grid.innerHTML = items.map(p=>`
+    <div class="card">
+      <div class="thumb"><img alt="" src="${p.img||'https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/brand-producthunt.svg'}"/></div>
+      <div class="info">
+        <div class="title">${p.nombre}</div>
+        <div class="price">${money(p.precio)} MXN</div>
+        <button class="btn" data-sku="${p.sku}">Agregar</button>
+      </div>
+    </div>
+  `).join('');
+  [...$grid.querySelectorAll('.btn')].forEach(btn=>{
+    btn.addEventListener('click',()=>addToCart(btn.dataset.sku));
   });
 }
-renderGrid(productos);
+renderGrid(DATA);
 
-q.addEventListener('input', e=>{
-  const s = e.target.value.toLowerCase();
-  const filtered = productos.filter(p=> p.nombre.toLowerCase().includes(s) || p.sku.toLowerCase().includes(s));
-  renderGrid(filtered);
-});
-
-function addToCart(p){
-  carrito[p.sku] = carrito[p.sku] || { ...p, qty:0 };
-  if (carrito[p.sku].qty < p.stock) carrito[p.sku].qty++;
+function addToCart(sku){
+  const item = DATA.find(x=>x.sku===sku);
+  if(!cart[sku]) cart[sku]={qty:0,item};
+  cart[sku].qty++;
+  showToast("Agregado: "+item.nombre);
   updateCartUI();
+  // Peek open
+  $sheet.classList.add('open');
 }
 
 function updateCartUI(){
-  const items = Object.values(carrito).filter(i=>i.qty>0);
-  cartView.innerHTML = items.map(i=>`
-    <div class="cart-item">
-      <div class="muted">${i.qty}×</div>
-      <div><div style="font-weight:700">${i.nombre}</div><div class="muted">${i.sku}</div></div>
-      <div class="qty">
-        <button class="iconbtn" onclick="chg('${i.sku}',-1)">−</button>
-        <button class="iconbtn" onclick="chg('${i.sku}',+1)">＋</button>
+  const entries = Object.values(cart);
+  let sum=0;
+  $cartList.innerHTML = entries.map(({item,qty})=>{
+    const line = item.precio*qty; sum+=line;
+    return `<div class="item">
+      <span class="badge">${qty}×</span>
+      <div class="small">${item.nombre}</div>
+      <div class="qtyctl">
+        <button class="kbd" data-act="minus" data-sku="${item.sku}">–</button>
+        <button class="kbd" data-act="plus" data-sku="${item.sku}">+</button>
+        <button class="kbd" data-act="rm" data-sku="${item.sku}">🗑</button>
       </div>
-      <div>$${(i.precio*i.qty).toFixed(2)}</div>
-    </div>
-  `).join('') || '<div class="wrap muted" style="padding:16px">Carrito vacío</div>';
-  const total = items.reduce((s,i)=>s + i.precio*i.qty, 0);
-  totalEl.textContent = `$${total.toFixed(2)}`;
+      <strong>${money(line)}</strong>
+    </div>`;
+  }).join('') || `<div class="small">Carrito vacío</div>`;
+  $total.textContent = money(sum);
+  // bind
+  [...$cartList.querySelectorAll('.kbd')].forEach(b=>b.addEventListener('click',cartAction));
 }
-window.chg = (sku,delta)=>{
-  if(!carrito[sku]) return;
-  carrito[sku].qty = Math.max(0, Math.min(carrito[sku].stock, carrito[sku].qty + delta));
+
+function cartAction(e){
+  const sku = e.currentTarget.dataset.sku;
+  const act = e.currentTarget.dataset.act;
+  if(!cart[sku]) return;
+  if(act==='plus') cart[sku].qty++;
+  if(act==='minus') cart[sku].qty = Math.max(0, cart[sku].qty-1);
+  if(act==='rm' || cart[sku].qty===0) delete cart[sku];
   updateCartUI();
-};
+}
 
-document.getElementById('toggleCart').onclick = ()=> drawer.classList.add('open');
-document.getElementById('closeCart').onclick = ()=> drawer.classList.remove('open');
+$q.addEventListener('input',()=>{
+  const v = $q.value.toLowerCase().trim();
+  const f = DATA.filter(p=> p.nombre.toLowerCase().includes(v) || p.sku.includes(v) );
+  renderGrid(f);
+});
 
-document.getElementById('checkout').onclick = ()=>{
-  const items = Object.values(carrito).filter(i=>i.qty>0);
-  if(!items.length){ alert('Añade productos al carrito'); return; }
-  dt.textContent = new Date().toLocaleString('es-MX');
-  tt.innerHTML = '<tbody>'+items.map(i=>`<tr><td>${i.qty}× ${i.nombre}</td><td style="text-align:right">$${(i.precio*i.qty).toFixed(2)}</td></tr>`).join('')
-    + '</tbody><tfoot><tr><td>Total</td><td style="text-align:right">'+ totalEl.textContent +'</td></tr><tr><td>Pago</td><td style="text-align:right">'+payment.value+'</td></tr></tfoot>';
-  dlg.showModal();
-  drawer.classList.remove('open');
-};
+// bottom sheet open/close
+let open = false;
+function setOpen(v){ open=v; $sheet.classList.toggle('open', open); }
+$toggle.addEventListener('click',()=>setOpen(false));
+// tap handle area to toggle
+$sheet.querySelector('.handle').addEventListener('click', (e)=>{
+  if(e.target.id==='toggle') return;
+  setOpen(!open);
+});
 
-document.getElementById('ok').onclick = ()=>{
-  carrito = {}; updateCartUI(); dlg.close();
-};
-document.getElementById('copy').onclick = async ()=>{
-  const txt = `Total: ${totalEl.textContent} — Pago: ${payment.value}`;
-  try{ await navigator.clipboard.writeText(txt); alert('Total copiado'); }catch{ alert(txt); }
-};
+// hide sheet while scrolling product list for visibility
+let lastY=window.scrollY;
+window.addEventListener('scroll', ()=>{
+  const down = window.scrollY > lastY;
+  lastY = window.scrollY;
+  if(down && !open){ $sheet.classList.add('hideOnScroll'); }
+  else { $sheet.classList.remove('hideOnScroll'); }
+}, {passive:true});
 
-updateCartUI();
+$finish.addEventListener('click',()=>{
+  const sum = Object.values(cart).reduce((a,{item,qty})=>a+item.precio*qty,0);
+  alert("Venta lista por "+money(sum)+" ("+document.getElementById('pay').value+")");
+  cart={}; updateCartUI(); setOpen(false);
+});
+
+function showToast(msg){
+  $toast.textContent = msg;
+  $toast.classList.add('show');
+  setTimeout(()=> $toast.classList.remove('show'), 1200);
+}
 </script>
 </body>
 </html>

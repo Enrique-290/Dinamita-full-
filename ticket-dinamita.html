@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ticket — DINÁMITA</title>
+<style>
+  :root{--ink:#111;--muted:#6b7280;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#e5e7eb;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto; color:#111;}
+  .sheet{max-width:420px;margin:0 auto;background:#fff;min-height:100vh;padding:18px 16px 96px;position:relative}
+  .brand{text-align:center;margin-bottom:8px}
+  .brand img{max-width:260px;max-height:110px;object-fit:contain}
+  h1{font-size:20px;margin:6px 0 4px;text-align:center}
+  .muted{color:var(--muted)}
+  .line{border-bottom:1px solid #e5e7eb;margin:10px 0}
+  .row{display:flex;justify-content:space-between;gap:10px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:6px 2px;text-align:left;border-bottom:1px dashed #e5e7eb;font-size:14px}
+  th{font-size:12px;color:#374151}
+  tfoot td{border-bottom:none;font-weight:800;font-size:18px}
+  .ctrl{position:fixed;inset:auto 0 0 0;display:flex;gap:8px;justify-content:center;padding:10px;background:#ffffffd9;border-top:1px solid #e5e7eb;backdrop-filter:saturate(1.2) blur(2px)}
+  button{border:1px solid #ddd;border-radius:10px;background:#fff;padding:10px 12px;cursor:pointer}
+  .primary{background:#ef4444;color:#fff;border-color:#ef4444}
+  details{margin-top:8px}
+  details summary{cursor:pointer;color:#ef4444;font-weight:700}
+  .cfg-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+  input[type="text"], textarea{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:10px}
+  .qr{display:flex;justify-content:center;margin-top:10px}
+  .muted-small{color:#6b7280;font-size:12px;text-align:center;margin-top:6px}
+  @media print{
+    .ctrl, details{display:none !important}
+    body{background:#fff}
+    .sheet{padding-bottom:0}
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="brand"><img id="logo" alt=""></div>
+    <h1 id="bname">DINÁMITA GYM</h1>
+    <div class="muted" id="contact" style="text-align:center">GIMNASIO MIXTO · DINAMITAGYM00@GMAIL.COM</div>
+    <div id="address" class="muted" style="text-align:center;margin-top:6px">AV: DIRECCIÓN</div>
+    <div class="line"></div>
+
+    <div class="row muted"><div>Folio: <strong id="folio"></strong></div><div>Fecha: <span id="fecha"></span></div></div>
+    <div class="row muted"><div>Status: <strong id="status"></strong></div><div id="clienteBox"></div></div>
+
+    <div class="line"></div>
+    <table>
+      <thead>
+        <tr><th>Clave</th><th>Descripción</th><th>Unidad</th><th style="text-align:right">Precio</th><th style="text-align:right">Subtotal</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+      <tfoot>
+        <tr><td colspan="4" style="text-align:right">Total</td><td id="total" style="text-align:right">$0.00</td></tr>
+      </tfoot>
+    </table>
+
+    <div id="qrBox" class="qr"></div>
+    <div id="footer" class="muted-small">Gracias por tu compra 💥</div>
+  </div>
+
+  <div class="ctrl">
+    <button onclick="window.print()" class="primary">Imprimir</button>
+    <button onclick="downloadImage()">Descargar imagen</button>
+    <button onclick="openCfg()">Configurar</button>
+    <button onclick="window.close()">Cerrar</button>
+  </div>
+
+  <details id="cfg" style="display:none">
+    <summary>Configuración</summary>
+    <div class="cfg-grid">
+      <label>Nombre del negocio <input id="cfg_name" type="text"></label>
+      <label>Logo (URL) <input id="cfg_logo" type="text" placeholder="https://..."></label>
+      <label>Contacto (línea debajo del nombre) <input id="cfg_contact" type="text" placeholder="tel/correo"></label>
+      <label>Dirección <textarea id="cfg_addr" rows="2"></textarea></label>
+      <label>Pie de página <input id="cfg_footer" type="text" placeholder="Gracias por tu compra"></label>
+      <label><input id="cfg_qr" type="checkbox"> Mostrar QR con identificador</label>
+      <div style="display:flex;gap:8px">
+        <button onclick="saveCfgFromUI()">Guardar</button>
+        <button onclick="closeCfg()">Cerrar</button>
+      </div>
+    </div>
+  </details>
+
+<script>
+function loadCfg(){
+  const d = localStorage.getItem('dinamita_ticket_cfg');
+  if(d){ try{ return JSON.parse(d);}catch(e){} }
+  return { name:'DINÁMITA GYM', logo:'', contact:'GIMNASIO MIXTO · DINAMITAGYM00@GMAIL.COM', address:'AV: DIRECCIÓN', footer:'Gracias por tu compra 💥', showQR:true };
+}
+function saveCfg(cfg){ localStorage.setItem('dinamita_ticket_cfg', JSON.stringify(cfg)); }
+function openCfg(){
+  const cfg = loadCfg();
+  cfg_name.value = cfg.name || '';
+  cfg_logo.value = cfg.logo || '';
+  cfg_contact.value = cfg.contact || '';
+  cfg_addr.value = cfg.address || '';
+  cfg_footer.value = cfg.footer || '';
+  cfg_qr.checked = !!cfg.showQR;
+  cfg.style.display='block'; cfg.open = true;
+}
+function closeCfg(){ cfg.open=false; cfg.style.display='none'; }
+function saveCfgFromUI(){
+  const cfgData = { name: cfg_name.value, logo: cfg_logo.value, contact: cfg_contact.value, address: cfg_addr.value, footer: cfg_footer.value, showQR: cfg_qr.checked };
+  saveCfg(cfgData); renderTicket(currentSale, cfgData); closeCfg();
+}
+function abrirTicket(sale){ currentSale = sale; renderTicket(sale, loadCfg()); }
+let currentSale = null;
+function renderTicket(sale, cfg){
+  bname.textContent = cfg.name || ''; contact.textContent = cfg.contact || ''; address.textContent = cfg.address || ''; footer.textContent = cfg.footer || '';
+  logo.src = cfg.logo || ''; logo.style.display = cfg.logo ? 'inline-block':'none';
+  folio.textContent = sale.folio || ''; fecha.textContent = (sale.fecha? new Date(sale.fecha): new Date()).toLocaleString(); status.textContent = sale.status || 'Pagado';
+  clienteBox.textContent = sale.cliente && sale.cliente.nombre ? 'Cliente: '+sale.cliente.nombre : '';
+  tbody.innerHTML=''; let total = 0;
+  (sale.items||[]).forEach(it=>{ const sub=(it.cant||1)*(it.precio||0); total+=sub;
+    const tr=document.createElement('tr'); tr.innerHTML=`<td>${it.sku||''}</td><td><div><strong>${it.desc||''}</strong></div><div class="muted">${(it.cant||1).toFixed(2)}</div></td><td>${it.unidad||'PIEZA'}</td><td style="text-align:right">${(it.precio||0).toFixed(2)}</td><td style="text-align:right">${sub.toFixed(2)}</td>`; tbody.appendChild(tr);
+  });
+  total.textContent = '$'+(sale.total ?? total).toFixed(2);
+  qrBox.innerHTML=''; if(cfg.showQR){ const data=sale.folio ? 'FOLIO:'+sale.folio : JSON.stringify(sale); const img=new Image(); img.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(data); qrBox.appendChild(img); }
+}
+function downloadImage(){ html2canvas(document.querySelector('.sheet')).then(c=>{ const a=document.createElement('a'); a.href=c.toDataURL('image/png'); a.download='ticket-dinamita.png'; a.click(); }); }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>(function(){ const auto=location.hash.includes('autoprint=1'); try{ const rawSale=localStorage.getItem('dinamita_last_sale'); if(rawSale){ const sale=JSON.parse(rawSale); abrirTicket(sale); if(auto) setTimeout(()=>window.print(), 400); } }catch(e){} })();</script>
+</body>
+</html>

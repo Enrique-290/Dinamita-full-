@@ -1,142 +1,168 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DINÁMITA POS — Catálogo</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DINÁMITA POS — Catálogo con Carrito</title>
 <style>
-  :root{--red:#e11d2a;--black:#111;--muted:#6b7280;}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#fff;color:#111;}
-  header{display:flex;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:2}
-  .brand{display:flex;align-items:center;gap:10px}
-  .badge{font-size:12px;color:#b91c1c;line-height:1.1}
-  h1{margin:18px;font-size:28px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:12px 16px;border-bottom:1px solid #eee;font-size:15px}
-  th{text-align:left;color:#374151;background:#fafafa;position:sticky;top:66px;z-index:1}
+  :root{
+    --bg:#ffffff;
+    --text:#111;
+    --muted:#6b7280;
+    --primary:#e11d48; /* rojo */
+    --black:#0b0b0b;
+    --border:#e5e7eb;
+    --chip:#f3f4f6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    background:var(--bg);
+    color:var(--text);
+  }
+  header{
+    position:sticky; top:0; z-index:20;
+    background:var(--bg);
+    border-bottom:1px solid var(--border);
+    padding:10px 16px;
+    display:flex; gap:12px; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; gap:10px; align-items:center;}
+  .dot{width:14px;height:14px;border-radius:50%;background:gold;box-shadow:0 0 0 2px #111 inset}
+  h1{font-size:18px; margin:0;}
+  .muted{color:var(--muted); font-size:12px; line-height:1.2}
+  main{padding:16px; padding-bottom:120px;}
+  table{width:100%; border-collapse:collapse}
+  th,td{padding:14px 10px; border-bottom:1px solid var(--border); text-align:left; vertical-align:middle}
+  th{font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em}
   .btn{
-    background:var(--red);color:#fff;border:0;border-radius:10px;padding:10px 14px;
-    font-weight:600;cursor:pointer
+    background:#111; color:#fff; border:none; padding:10px 16px; border-radius:12px; font-weight:600;
   }
-  .btn:disabled{opacity:.6;cursor:not-allowed}
-  .add{background:#111}
-  .page{max-width:980px;margin:0 auto;padding-bottom:120px}
-  .cartBar{
-    position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #eee;
-    display:flex;gap:14px;align-items:center;justify-content:space-between;
-    padding:12px 14px;z-index:5
+  .btn:active{transform:scale(.98)}
+  .price{font-variant-numeric:tabular-nums}
+  .sku{color:var(--muted); font-size:12px}
+  /* Sticky footer bar */
+  .cart-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    background:var(--bg);
+    border-top:1px solid var(--border);
+    padding:10px 12px;
+    display:flex; gap:10px; align-items:center; justify-content:space-between;
   }
-  .cartList{position:fixed;left:10px;right:10px;bottom:78px;background:#fff;border:1px solid #eee;border-radius:10px;
-    box-shadow:0 6px 24px rgba(0,0,0,.08);max-height:45vh;overflow:auto;padding:10px;display:none}
-  .cartItem{
-    display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
-    padding:8px 6px;border-bottom:1px dashed #eee;font-size:14px
+  .left{display:flex; gap:10px; align-items:center;}
+  .chip{background:var(--chip); border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:13px}
+  .total{font-weight:800; font-size:18px}
+  .pay{padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff}
+  /* Drawer */
+  .drawer{
+    position:fixed; left:10px; right:10px; bottom:62px; z-index:25;
+    background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08);
+    display:none; /* hidden by default */
   }
-  .qtyCtl button{width:28px;height:28px;border-radius:8px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
-  .del{background:#fff;border:1px solid #eee;border-radius:8px;padding:6px 10px;cursor:pointer}
-  .pill{padding:2px 8px;border-radius:999px;background:#f3f4f6;color:#111;font-size:12px}
-  .muted{color:#6b7280}
-  .ticket{
-    position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;
-  }
-  .ticket .card{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  .ticket h3{margin:0 0 6px 0}
-  .ticket table{width:100%}
-  .ticket td, .ticket th{font-size:14px;border-bottom:1px solid #f0f0f0;padding:8px}
-  .right{text-align:right}
-  .logoDot{width:26px;height:26px;border-radius:6px;background:#111;display:grid;place-items:center;color:#ffbf00;font-weight:900}
-  .tip{margin:8px 18px 0 18px;color:#6b7280;font-size:13px}
-  .enter{margin-left:auto;display:flex;gap:8px}
-  input[type=email]{
-    border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:14px;width:220px
-  }
-  .toggle{color:#374151;font-size:14px;cursor:pointer;text-decoration:underline}
+  .drawer.open{display:block;}
+  .drawer-header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border);}
+  .drawer-body{max-height:40vh; overflow:auto; padding:6px 10px;}
+  .row{display:grid; grid-template-columns: 1fr auto auto auto; gap:10px; align-items:center; padding:10px; border-bottom:1px solid var(--border);}
+  .row:last-child{border-bottom:none}
+  .qty{display:flex; gap:8px; align-items:center;}
+  .iconbtn{width:34px; height:34px; border-radius:10px; border:1px solid var(--border); background:#fff; font-weight:700}
+  .trash{width:34px;height:34px; border:none; background:#fee2e2; color:#991b1b; border-radius:10px; font-weight:800}
+  .hide-link{color:var(--muted); text-decoration:underline; cursor:pointer; font-size:14px}
+  .footer-actions{display:flex; gap:10px; align-items:center; justify-content:space-between; padding:10px 12px;}
+  .final{background:var(--primary);}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
-    <div class="logoDot">★</div>
+    <div class="dot"></div>
     <div>
-      <div style="font-weight:800;letter-spacing:.2px">DINÁMITA <span style="color:var(--red)">POS</span></div>
-      <div class="badge">Modo Seguro (sin impresora)</div>
+      <div style="font-weight:800">DINÁMITA <span style="color:var(--primary)">POS</span></div>
+      <div class="muted">Modo Seguro (sin impresora)</div>
     </div>
   </div>
-  <div class="enter">
-    <input type="email" placeholder="tu correo" id="mail">
-    <button class="btn">Entrar</button>
+  <div>
+    <input id="email" placeholder="tu correo" style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;"/>
+    <button class="btn" id="enterBtn">Entrar</button>
   </div>
 </header>
-
-<div class="page">
-  <h1>Catálogo</h1>
-  <div class="tip">Tip: toca <b>“+”</b> en el carrito para aumentar cantidad; <b>“–”</b> para disminuir; 🗑️ basurero para quitar.</div>
-  <table id="tbl">
+<main>
+  <h2>Catálogo</h2>
+  <p class="muted">Tip: el carrito ahora <b>no tapa</b> los productos; si se abre puedes <b>ocultarlo</b> o deja espacio para seguir viendo la lista 👍</p>
+  <table id="catalog">
     <thead>
-      <tr><th>SKU</th><th>Producto</th><th>$</th><th>Stock</th><th></th></tr>
+      <tr>
+        <th>SKU</th><th>Producto</th><th>$</th><th>Stock</th><th></th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
+</main>
+
+<!-- Drawer del carrito -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div style="font-weight:800">Carrito</div>
+    <div class="hide-link" id="hideDrawer">Ocultar carrito</div>
+  </div>
+  <div class="drawer-body" id="cartList"></div>
 </div>
 
-<div class="cartList" id="cartList"></div>
-<div class="cartBar">
-  <div>
-    <span class="toggle" id="toggleCart">Mostrar carrito</span>
-  </div>
-  <div>
-    <select id="pay">
+<!-- Barra -->
+<div class="cart-bar" id="cartBar">
+  <div class="left">
+    <span class="hide-link" id="toggleDrawer">Mostrar carrito</span>
+    <span class="chip" id="itemsChip">0 items</span>
+    <select id="payment" class="pay">
       <option>Efectivo</option>
       <option>Tarjeta</option>
       <option>Transferencia</option>
     </select>
-    <span style="margin:0 12px;font-weight:800" id="total">$0.00</span>
-    <button class="btn" id="checkout">Finalizar venta</button>
   </div>
-</div>
-
-<div class="ticket" id="ticket">
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="logoDot">★</div>
-      <div><h3 style="margin:0">DINÁMITA GYM — Ticket</h3><div class="muted" id="tDate"></div></div>
-    </div>
-    <table id="tTable"><thead><tr><th>Tipo</th><th>Concepto</th><th class="right">$</th></tr></thead><tbody></tbody></table>
-    <div style="display:flex;justify-content:space-between;margin-top:10px">
-      <div class="muted">Gracias por tu compra 💥</div>
-      <div style="font-weight:800" id="tTotal"></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-      <button class="del" id="closeTicket">Cerrar</button>
-    </div>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <span class="total" id="total">$0.00</span>
+    <button class="btn final" id="finish">Finalizar venta</button>
   </div>
 </div>
 
 <script>
-const seed = [{"sku": "758104001972", "name": "Agua Bonafont 1L", "price": 14, "stock": 20, "category": "Agua"}, {"sku": "758104000159", "name": "Agua Bonafont 2L", "price": 20, "stock": 20, "category": "Agua"}, {"sku": "758104005796", "name": "Agua Bonafont 1.5L", "price": 16, "stock": 20, "category": "Agua"}, {"sku": "0237433", "name": "Gatorade 1L", "price": 26, "stock": 20, "category": "Hidratante"}, {"sku": "037617310649", "name": "Gatorade 600ml", "price": 20, "stock": 20, "category": "Hidratante"}, {"sku": "7503027753", "name": "Volt Blue", "price": 22, "stock": 20, "category": "Energética"}, {"sku": "7503027753Y", "name": "Volt Yellow", "price": 22, "stock": 20, "category": "Energética"}, {"sku": "7503027753P", "name": "Volt Pink", "price": 22, "stock": 20, "category": "Energética"}, {"sku": "ELECTROLIT", "name": "Electrolit", "price": 25, "stock": 20, "category": "Hidratante"}, {"sku": "TPW", "name": "T Proteína Whey", "price": 25, "stock": 20, "category": "Suplemento"}, {"sku": "TPM", "name": "T Proteína Mass", "price": 35, "stock": 20, "category": "Suplemento"}, {"sku": "OX", "name": "Óxido", "price": 25, "stock": 20, "category": "Suplemento"}];
-let items = seed.map(p=>Object.assign({}, p));
+const seed = [
+  {sku:"758104000159", name:"Agua Bonafont 2L", price:20, stock:20},
+  {sku:"758104005796", name:"Agua Bonafont 1.5L", price:16, stock:20},
+  {sku:"0237433", name:"Gatorade 1L", price:26, stock:20},
+  {sku:"036171310649", name:"Gatorade 600ml", price:20, stock:20},
+  {sku:"7503027753", name:"Volt Blue", price:22, stock:20},
+  {sku:"7503027753Y", name:"Volt Yellow", price:22, stock:20},
+  {sku:"7503027753P", name:"Volt Pink", price:22, stock:20},
+  {sku:"ELECTROLIT", name:"Electrolit", price:25, stock:20},
+  {sku:"TPW", name:"T Proteína Whey", price:25, stock:20},
+  {sku:"TPM", name:"T Proteína Mass", price:35, stock:20},
+  {sku:"OX", name:"Óxido", price:25, stock:20},
+];
 
-const tbody = document.querySelector("#tbl tbody");
+const tbody = document.querySelector("#catalog tbody");
+const drawer = document.getElementById("drawer");
 const cartList = document.getElementById("cartList");
+const toggleDrawer = document.getElementById("toggleDrawer");
+const hideDrawer = document.getElementById("hideDrawer");
+const itemsChip = document.getElementById("itemsChip");
 const totalEl = document.getElementById("total");
-const ticket = document.getElementById("ticket");
-const tTableBody = ticket.querySelector("tbody");
-const tDate = document.getElementById("tDate");
-const tTotal = document.getElementById("tTotal");
+const finishBtn = document.getElementById("finish");
 
-const cart = new Map(); // sku -> {sku,name,price,qty}
+let cart = []; // {sku, name, price, qty}
 
-function format(n){return `$${n.toFixed(2)}`}
+function currency(n){ return "$" + n.toFixed(2); }
 
-function renderRows(){
+function renderCatalog(){
   tbody.innerHTML = "";
-  items.forEach(p=>{
+  seed.forEach(p => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${p.sku}</td>
+      <td><div class="sku">${p.sku}</div></td>
       <td>${p.name}</td>
-      <td>${format(p.price)}</td>
+      <td class="price">${currency(p.price)}</td>
       <td>${p.stock}</td>
       <td><button class="btn add" data-sku="${p.sku}">Agregar</button></td>
     `;
@@ -144,89 +170,93 @@ function renderRows(){
   });
 }
 
-function updateCartUI(){
-  let total = 0;
+function syncFooterPadding(){
+  // Cuando el drawer está abierto, dejamos más espacio para que no tape el listado
+  document.querySelector("main").style.paddingBottom = drawer.classList.contains("open") ? "55vh" : "120px";
+}
+
+function setDrawer(open){
+  drawer.classList.toggle("open", open);
+  toggleDrawer.textContent = open ? "Ocultar carrito" : "Mostrar carrito";
+  syncFooterPadding();
+}
+
+toggleDrawer.addEventListener("click", ()=> setDrawer(!drawer.classList.contains("open")));
+hideDrawer.addEventListener("click", ()=> setDrawer(false));
+
+function addToCart(sku){
+  const prod = seed.find(p => p.sku === sku);
+  if(!prod) return;
+  const existing = cart.find(i => i.sku === sku);
+  if(existing){ existing.qty++; }
+  else { cart.push({sku:prod.sku, name:prod.name, price:prod.price, qty:1}); }
+  renderCart();
+  // Abre el carrito un segundo y luego se puede ocultar
+  setDrawer(true);
+}
+
+function renderCart(){
+  // chip & total
+  const items = cart.reduce((a,b)=>a+b.qty,0);
+  itemsChip.textContent = items + " items";
+  const total = cart.reduce((a,b)=>a + b.qty * b.price, 0);
+  totalEl.textContent = currency(total);
+
+  // body
   cartList.innerHTML = "";
-  cart.forEach(it=>{
-    const line = it.price * it.qty;
-    total += line;
+  cart.forEach((item, idx)=>{
     const row = document.createElement("div");
-    row.className = "cartItem";
+    row.className = "row";
     row.innerHTML = `
-      <div><span class="pill">${it.qty}×</span> ${it.name}</div>
-      <div class="qtyCtl">
-        <button data-act="dec" data-sku="${it.sku}">–</button>
-        <button data-act="inc" data-sku="${it.sku}">+</button>
+      <div><strong>${item.name}</strong><div class="sku">${item.sku}</div></div>
+      <div class="qty">
+        <button class="iconbtn minus" data-idx="${idx}">–</button>
+        <span>${item.qty}×</span>
+        <button class="iconbtn plus" data-idx="${idx}">+</button>
       </div>
-      <div class="right">${format(line)}</div>
-      <button class="del" data-act="del" data-sku="${it.sku}">🗑️</button>
+      <div class="price">${currency(item.qty * item.price)}</div>
+      <button class="trash" data-idx="${idx}">🗑</button>
     `;
     cartList.appendChild(row);
   });
-  totalEl.textContent = format(total);
 }
 
-tbody.addEventListener("click", e=>{
-  const btn = e.target.closest("button.add");
+cartList.addEventListener("click", (e)=>{
+  const idx = e.target.getAttribute("data-idx");
+  if(idx === null) return;
+  if(e.target.classList.contains("plus")){ cart[idx].qty++; }
+  else if(e.target.classList.contains("minus")){ cart[idx].qty = Math.max(0, cart[idx].qty - 1); if(cart[idx].qty===0) cart.splice(idx,1); }
+  else if(e.target.classList.contains("trash")){ cart.splice(idx,1); }
+  renderCart();
+});
+
+tbody.addEventListener("click",(e)=>{
+  const btn = e.target.closest(".add");
   if(!btn) return;
-  const sku = btn.dataset.sku;
-  const p = items.find(x=>x.sku===sku);
-  if(!p) return;
-  const cur = cart.get(sku) || {sku,name:p.name,price:p.price,qty:0};
-  cur.qty += 1;
-  cart.set(sku, cur);
-  updateCartUI();
-  showCart(true);
+  addToCart(btn.dataset.sku);
 });
 
-cartList.addEventListener("click", e=>{
-  const target = e.target.closest("button");
-  if(!target) return;
-  const sku = target.dataset.sku;
-  const it = cart.get(sku);
-  if(!it) return;
-  const act = target.dataset.act;
-  if(act==="inc"){ it.qty += 1; }
-  else if(act==="dec"){ it.qty = Math.max(0, it.qty-1); if(it.qty===0) cart.delete(sku); }
-  else if(act==="del"){ cart.delete(sku); }
-  updateCartUI();
-});
-
-function showCart(open){
-  cartList.style.display = open? "block":"none";
-  document.getElementById("toggleCart").textContent = open? "Ocultar carrito":"Mostrar carrito";
-}
-document.getElementById("toggleCart").onclick = ()=>{
-  const open = cartList.style.display !== "block";
-  showCart(open);
-};
-
-document.getElementById("checkout").onclick = ()=>{
-  // build ticket
-  tDate.textContent = new Date().toLocaleString();
-  tTableBody.innerHTML = "";
+finishBtn.addEventListener("click", ()=>{
+  if(cart.length===0){ alert("Carrito vacío"); return; }
+  const fecha = new Date().toLocaleString();
+  let html = "<h2>DINÁMITA GYM — Ticket</h2>";
+  html += `<div style='color:#666'>${fecha}</div>`;
+  html += "<table style='width:100%;border-collapse:collapse;margin-top:10px'>";
+  html += "<tr><th style='text-align:left;border-bottom:1px solid #ddd'>Concepto</th><th style='text-align:right;border-bottom:1px solid #ddd'>$</th></tr>";
   let total = 0;
-  cart.forEach(it=>{
-    const line = it.price * it.qty;
-    total += line;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>producto</td><td>${it.name} <span class="muted">(${it.qty}×)</span></td><td class="right">${format(line)}</td>`;
-    tTableBody.appendChild(tr);
-  });
-  tTotal.textContent = format(total);
-  ticket.style.display = "flex";
-  // clear cart so it no se queda "atorado"
-  cart.clear();
-  updateCartUI();
-  showCart(false);
-};
+  cart.forEach(i=>{ const sub=i.qty*i.price; total+=sub; html += `<tr><td>${i.qty}× ${i.name}</td><td style='text-align:right'>${currency(sub)}</td></tr>`; });
+  html += `<tr><td style='text-align:right;font-weight:800;border-top:1px solid #ddd'>Total</td><td style='text-align:right;font-weight:800;border-top:1px solid #ddd'>${currency(total)}</td></tr>`;
+  html += "</table><p>Gracias por tu compra 💥</p>";
+  const w = window.open("", "_blank");
+  w.document.write(html);
+  w.document.close();
+  // Limpia carrito pero no cierra el drawer a la fuerza
+  cart = []; renderCart();
+});
 
-document.getElementById("closeTicket").onclick = ()=>{
-  ticket.style.display = "none";
-};
-
-renderRows();
-updateCartUI();
+// init
+renderCatalog();
+renderCart();
 </script>
 </body>
 </html>
